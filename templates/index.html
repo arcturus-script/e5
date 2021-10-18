@@ -22,31 +22,123 @@
         </tr>
         <tr>
             <td>
-                <label id="label" for="scope">作用域(scope)</label>
+                <label id="label" for="ClientSecret">应用密钥</label>
             </td>
-            <td><textarea row="4" id="scope"></textarea>
+            <td>
+                <input id="ClientSecret" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label id="ScopeAndTokenLabel" for="ScopeAndToken"></label>
+            </td>
+            <td><textarea row="4" id="ScopeAndToken"></textarea>
             </td>
         </tr>
     </table>
-    <div>
-        <button class="btn" onclick="getToken()">提交</button>
-    </div>
-    <script type="text/javascript">
-        // 必须请求 offline_access 否则没有 refresh_token
-        var scope_value =
-            "offline_access Files.Read.All Files.ReadWrite.All Sites.Read.All Sites.ReadWrite.All User.Read.All User.ReadWrite.All Directory.Read.All Directory.ReadWrite.All Mail.Read Mail.ReadWrite MailboxSettings.Read MailboxSettings.ReadWrite";
-        var scope = document.getElementById('scope');
-        scope.value = scope_value;
+    <button id="btn"></button>
+    <script>
+        // 根据 ID 获取 DOM
+        function DomByID(ID) {
+            return document.getElementById(ID);
+        }
 
+        function getCode(REDIRECT_URI, CLIENT_ID, SCOPE_VALUE, CLIENT_SECRET) {
+            if (CLIENT_ID && CLIENT_SECRET) {
+                // 获取授权码地址
+                const AUTHORIZE = 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize';
+                // 将应用 ID 和密钥存入缓存
+                localStorage.setItem('CLIENT_ID', CLIENT_ID);
+                localStorage.setItem('CLIENT_SECRET', CLIENT_SECRET);
+                // 跳转获取授权码
+                location.href =
+                    `${AUTHORIZE}?client_id=${CLIENT_ID}&scope=${SCOPE_VALUE}&response_type=code&redirect_uri=${REDIRECT_URI}`
+            } else {
+                alert("请先填写完毕后再提交哦😛")
+            }
+        }
+
+        function getUrlParams(url) {
+            // 从 url 中截取 “?” 后的参数形成 json
+            const reg = /([^?&=]+)=([^?&=]*)/g;
+            let obj = {};
+            url.replace(reg, function (rs, $1, $2) {
+                let name = decodeURIComponent($1);
+                let val = decodeURIComponent($2);
+                obj[name] = val;
+                return rs;
+            });
+            return obj;
+        }
+
+        // 向 flask 服务器请求
         function getToken() {
-            // 跳转获取授权码
-            var authorize = 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize';
-            var redirect_uri = 'http://localhost:5000/token'
+            const xhr = new XMLHttpRequest();
 
-            var ClientID = document.getElementById('ClientID').value;
+            xhr.open("POST", '../getToken', false);
+            xhr.setRequestHeader('content-type', 'application/json');
+            const data = {
+                "code": CODE,
+                "client_id": localStorage.getItem('CLIENT_ID'),
+                "client_secret": localStorage.getItem('CLIENT_SECRET'),
+                "redirect_uri": REDIRECT_URI, // 重定向地址
+                "grant_type": "authorization_code"
+            }
+            xhr.send(JSON.stringify(data));
+            SCOPE_AND_TOKEN.value = xhr.responseText; // 将收到的数据渲染到文本框上
+        }
 
-            location.href =
-                `${authorize}?client_id=${ClientID}&scope=${scope_value}&response_type=code&redirect_uri=${redirect_uri}`
+        function copyToClipboard(value) {
+            // 创建一个文本框
+            const el = document.createElement("textarea");
+            el.value = value;
+            // 根据 DOM 添加属性
+            Object.assign(el.style, {
+                position: "absolute",
+                left: "-999px"
+            });
+            // 插入文本框
+            document.body.appendChild(el);
+            el.select(); // 选择这个隐藏的文本框
+            document.execCommand("Copy");
+            el.parentNode.removeChild(el); // 删除文本框
+            alert("复制成功")
+        }
+
+        // 复制 Token
+        function copyToken(SCOPE_AND_TOKEN) {
+            copyToClipboard(SCOPE_AND_TOKEN);
+        }
+
+        const CODE = getUrlParams(window.location.search).code; // 获取 url 里的参数
+        const BTN = DomByID("btn");
+        const CLIENT_ID = DomByID('ClientID');
+        const CLIENT_SECRET = DomByID("ClientSecret");
+        const SCOPE_AND_TOKEN = DomByID('ScopeAndToken');
+        const REDIRECT_URI = 'http://localhost:5000/';
+        const SCOPE_AND_TOKEN_LABEL = DomByID("ScopeAndTokenLabel");
+
+        if (!CODE) {
+            // 作用域(scope)
+            // 必须请求 offline_access 否则没有 refresh_token
+            const SCOPE_VALUE = "offline_access Files.Read.All Files.ReadWrite.All Sites.Read.All Sites.ReadWrite.All User.Read.All User.ReadWrite.All Directory.Read.All Directory.ReadWrite.All Mail.Read Mail.ReadWrite MailboxSettings.Read MailboxSettings.ReadWrite";
+            SCOPE_AND_TOKEN.value = SCOPE_VALUE; // 给用户展示默认的作用域
+            BTN.innerHTML = '提交'
+            SCOPE_AND_TOKEN_LABEL.innerHTML = '作用域'
+            // 给 button 绑定获取授权码事件
+            BTN.addEventListener('click', ()=>{
+                getCode(REDIRECT_URI, CLIENT_ID.value, SCOPE_VALUE, CLIENT_SECRET.value);
+            });
+        } else {
+            BTN.innerHTML = '复制';
+            SCOPE_AND_TOKEN_LABEL.innerHTML = '刷新令牌';
+            CLIENT_ID.value = localStorage.getItem("CLIENT_ID");
+            CLIENT_SECRET.value = localStorage.getItem("CLIENT_SECRET")
+            getToken();
+            // 给 button 绑定获取授权码事件
+            BTN.addEventListener('click', ()=> {
+                copyToken(SCOPE_AND_TOKEN.value);
+            });
         }
     </script>
 </body>
