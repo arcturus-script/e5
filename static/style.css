@@ -1,4 +1,10 @@
+@font-face {
+    font-family: 'ZhuZiAWan';
+    src: url('https://cdn.jsdelivr.net/gh/tzy13755126023/BLOG_SOURCE/font/ZhuZiAWan.woff2');
+}
+
 * {
+    font-family: 'ZhuZiAWan';
     box-sizing: border-box;
     font-size: 20px;
     margin: 0;
