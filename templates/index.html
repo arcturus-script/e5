@@ -115,12 +115,12 @@
         const CLIENT_ID = DomByID('ClientID');
         const CLIENT_SECRET = DomByID("ClientSecret");
         const SCOPE_AND_TOKEN = DomByID('ScopeAndToken');
-        // let hostname = window.location.hostname;
-        // if(hostname = '127.0.0.1'){
-        //     hostname = 'localhost';
-        // }
-        // const REDIRECT_URI = `${window.location.protocol}//${hostname}:${window.location.port}`;
-        const REDIRECT_URI = 'http://localhost:5000/';
+        let hostname = window.location.hostname;
+        if(hostname = '127.0.0.1'){
+            hostname = 'localhost';
+        }
+        const REDIRECT_URI = `${window.location.protocol}//${hostname}:${window.location.port}`;
+        // const REDIRECT_URI = 'http://localhost:5000/';
         const SCOPE_AND_TOKEN_LABEL = DomByID("ScopeAndTokenLabel");
 
         if (!CODE) {
