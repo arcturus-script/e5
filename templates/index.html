@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="Shortcut Icon" href="{{ url_for('static', filename='favicon.ico') }}" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="styleSheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>获取刷新令牌</title>
+</head>
+
+<body class="flex-center">
+    <table id="table">
+        <tr>
+            <td>
+                <label id="label" for="ClientID">应用ID</label>
+            </td>
+            <td>
+                <input id="ClientID" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label id="label" for="scope">作用域(scope)</label>
+            </td>
+            <td><textarea row="4" id="scope"></textarea>
+            </td>
+        </tr>
+    </table>
+    <div>
+        <button class="btn" onclick="getToken()">提交</button>
+    </div>
+    <script type="text/javascript">
+        // 必须请求 offline_access 否则没有 refresh_token
+        var scope_value =
+            "offline_access Files.Read.All Files.ReadWrite.All Sites.Read.All Sites.ReadWrite.All User.Read.All User.ReadWrite.All Directory.Read.All Directory.ReadWrite.All Mail.Read Mail.ReadWrite MailboxSettings.Read MailboxSettings.ReadWrite";
+        var scope = document.getElementById('scope');
+        scope.value = scope_value;
+
+        function getToken() {
+            // 跳转获取授权码
+            var authorize = 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize';
+            var redirect_uri = 'http://localhost:5000/token'
+
+            var ClientID = document.getElementById('ClientID').value;
+
+            location.href =
+                `${authorize}?client_id=${ClientID}&scope=${scope_value}&response_type=code&redirect_uri=${redirect_uri}`
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="Shortcut Icon" href="{{ url_for('static', filename='favicon.ico') }}" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="styleSheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>获取令牌</title>
+</head>
+
+<body class="flex-center">
+    <table id="table">
+        <tr>
+            <td>
+                <label id="label" for="ClientID">应用ID</label>
+            </td>
+            <td>
+                <input id="ClientID" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label id="label" for="ClientID">应用密钥</label>
+            </td>
+            <td>
+                <input id="ClientSecret" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label id="label" for="refresh_token">刷新令牌</label>
+            </td>
+            <td>
+                <textarea id="refresh_token" rows="4"></textarea>
+            </td>
+        </tr>
+    </table>
+    <div>
+        <button class="btn" onclick="getToken()">提交</button>
+        <button class="btn" onclick="copyToken()">复制</button>
+    </div>
+    <script>
+        // 根据 ID 获取 DOM
+        function DomByID(ID) {
+            return document.getElementById(ID);
+        }
+
+        function getUrlParams(url) {
+            // 从 url 中截取 “?” 后的参数形成 json
+            const reg = /([^?&=]+)=([^?&=]*)/g;
+            let obj = {};
+            url.replace(reg, function (rs, $1, $2) {
+                let name = decodeURIComponent($1);
+                let val = decodeURIComponent($2);
+                obj[name] = val;
+                return rs;
+            });
+            return obj;
+        }
+
+        function getToken() {
+            const CODE = getUrlParams(window.location.search).code;
+            const CLIENT_ID = DomByID("ClientID").value;
+            const CLIENT_SECRET = DomByID("ClientSecret").value;
+
+            var xhr;
+            xhr = new XMLHttpRequest();
+
+            // 向服务器发送请求
+            xhr.open("POST", '../getToken', false);
+            xhr.setRequestHeader('content-type', 'application/json');
+            const data = {
+                "code": CODE,
+                "client_id": CLIENT_ID,
+                "client_secret": CLIENT_SECRET,
+                "redirect_uri": "http://localhost:5000/token", // 重定向地址
+                "grant_type": "authorization_code"
+            }
+            xhr.send(JSON.stringify(data));
+            const REFRESH_TOKEN = DomByID("refresh_token");
+            REFRESH_TOKEN.value = xhr.responseText; // 将收到的数据渲染到文本框上
+        }
+
+        function copyToClipboard(value) {
+            // 创建一个文本框
+            const el = document.createElement("textarea");
+            el.value = value;
+            // 根据 DOM 添加属性
+            Object.assign(el.style, {
+                position: "absolute",
+                left: "-999px"
+            });
+            // 插入文本框
+            document.body.appendChild(el);
+            el.select(); // 选择这个隐藏的文本框
+            document.execCommand("Copy");
+            document.removeChild(el); // 删除文本框
+        }
+
+        // 复制 Token
+        function copyToken() {
+            let refresh_token = DomByID("refresh_token");
+            copyToClipboard(refresh_token.value);
+        }
+    </script>
+</body>
+
+</html>
