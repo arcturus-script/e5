@@ -21,9 +21,12 @@ def Token():
         url = 'https://login.microsoftonline.com/common/oauth2/v2.0/token'
         headers = {'Content-Type': 'application/x-www-form-urlencoded'}
         rep = json.loads(requests.post(url, headers=headers, data=datas).text)
-        return rep.get('refresh_token')
+        if ('error' in rep):
+            return rep.get('error_description')
+        else:
+            return rep.get('refresh_token')
     else:
-        return "没获取到 token 😥"
+        return "请使用 post 请求"
 
 
 if __name__ == '__main__':
