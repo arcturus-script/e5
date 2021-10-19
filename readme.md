@@ -72,7 +72,7 @@
 
 7. 将 Azure 的重定向地址改为 `http://localhost:5000`
 
-> 目前本地部署仅火狐浏览器可以在 http://localhost:5000 或者 http:127.0.0.1:5000 上获取成功，其他浏览器只能在 http://localhost:5000 下才能成功
+> 目前本地部署仅火狐浏览器可以在 http://localhost:5000 或者 http://127.0.0.1:5000 上获取成功，其他浏览器只能在 http://localhost:5000 下才能成功
 
 ### 获取 refresh_token
 
