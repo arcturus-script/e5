@@ -5,26 +5,12 @@
     <div>A program developed with Vue 3 in Vite to obtain refresh token.</div>
 </div>
 
-## Setup
+### setup
 
 ```sh
 pnpm install
 ```
 
-### Compile and Hot-Reload for Development
-
 ```sh
 pnpm dev
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-pnpm build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-pnpm lint
 ```
