@@ -2,7 +2,7 @@
 
 <div align="center">
     <h2>E5</h2>
-    <div>A program developed with Vue 3 in Vite to obtain refresh token.</div>
+    <div>A program developed with Nuxt3 to obtain refresh token.</div>
 </div>
 
 ### setup
