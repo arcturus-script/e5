@@ -16,7 +16,7 @@ export function log(msg: any, ...options: any[]) {
 }
 
 export function get(key: string) {
-  return localStorage.getItem(key);
+  return localStorage.getItem(key) ?? '';
 }
 
 export function save(key: string, value: string) {

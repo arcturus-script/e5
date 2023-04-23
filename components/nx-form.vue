@@ -57,6 +57,7 @@
 <script lang="ts" setup>
 import { message } from 'ant-design-vue';
 import { useClipboard } from '@vueuse/core';
+import { get } from '@utils/tools';
 
 interface FormData {
   appID: string;
@@ -91,6 +92,11 @@ const formData = ref<FormData>({
   scopes: opts
 });
 
+onMounted(() => {
+  formData.value.appID = get('appID');
+  formData.value.appSecret = get('appSecret');
+});
+
 const access_token = ref('');
 const refresh_token = ref('');
 
@@ -114,6 +120,8 @@ const getToken = () => {
     getRefreshToken(code)
       .then((res) => {
         log(res);
+
+        message.success('token 获取成功');
 
         access_token.value = res.access_token;
         refresh_token.value = res.refresh_token;
